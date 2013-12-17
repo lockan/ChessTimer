@@ -15,14 +15,21 @@ public class ChessTimer {
 	
 	private class CountDownTask extends TimerTask {    
 		public void run() {
-            t_remain--;
-            System.out.println(t_remain);
+        	if (t_remain > 0) {
+        		t_remain--;
+        		System.out.println(t_remain);
+        	}
+        	else {
+        		cancel();
+        	}
         }
     }
 	
 	public static void main(String[] args) {
-		ChessTimer ct = new ChessTimer(1000000);
-		Timer countDown = new Timer("Game Clock", true);	//isDaemon - for repeated tasks. 		
+		ChessTimer ct = new ChessTimer(5);
+		Timer countDown = new Timer("Game Clock", false);	//arg2 - bool isDaemon
+		//REMINDER: if Timer is daemon, JVM will terminate main thread because no non-daemon threads exist. 
+		//If need Daemon, force main thread to wait. 
 		countDown.scheduleAtFixedRate(ct.new CountDownTask(), 0, updateFreq);
 	}
 	
@@ -31,4 +38,5 @@ public class ChessTimer {
 		t_remain = t_time;
 		System.out.println("Timer init to " + t_time);
 	}
+
 }
