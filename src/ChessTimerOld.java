@@ -1,14 +1,14 @@
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ChessTimer {
+public class ChessTimerOld {
 	
 	private static final long updateFreq = 1000;
 	
 	private long t_time = 0;
 	private long t_remain = 0;
 	
-	public ChessTimer(long inTime) {
+	public ChessTimerOld(long inTime) {
 		t_time = inTime;
 		t_remain = inTime;
 	}
@@ -26,7 +26,7 @@ public class ChessTimer {
     }
 	
 	public static void main(String[] args) {
-		ChessTimer ct = new ChessTimer(5);
+		ChessTimerOld ct = new ChessTimerOld(5);
 		Timer countDown = new Timer("Game Clock", false);	//arg2 - bool isDaemon
 		//REMINDER: if Timer is daemon, JVM will terminate main thread because no non-daemon threads exist. 
 		//If need Daemon, force main thread to wait. 
