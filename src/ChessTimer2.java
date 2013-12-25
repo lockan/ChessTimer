@@ -1,17 +1,22 @@
 import java.text.DecimalFormat;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class ChessTimer2 {
 	
 	// Time Vars
-	private static int hundredths;
+	private static Integer hundredths;
     private static int seconds;
     private static int minutes;
-    private static int hours; 
-	
+    private static int hours;
+    
+	// Timer vars
+    private static final long updateFreq = 10;
+    
     // Time string formatting vars
     private String timeString = "";
     private DecimalFormat timeFormat = new DecimalFormat("00");
+    private DecimalFormat hundredths_fmt = new DecimalFormat("000");
     
     public ChessTimer2(int hh, int mm, int ss, int hs) {
     	//TODO: once validation added, use the setters in the constructor. 
@@ -34,17 +39,24 @@ public class ChessTimer2 {
     	seconds = ss;
     }
     
-    private void countDown() { 
-    	hundredths--;
-    	if (hundredths <= 0) {
+    private void countDown() {
+    	//TODO: This entire logic tree is broken. Fix it. 
+    	//TODO: Change this to use a single long value that represents milliseconds? 
+    	if (hundredths > 0) {
+    		hundredths--;
+    	}
+    	
+    	if ( (hundredths <= 0) && (seconds > 0) ) {
     		seconds--;
     		hundredths = 100;
     	}
-    	if (seconds <= 0 ) {
+    	
+    	if ( (seconds <= 0 ) && (minutes > 0) ){
     		minutes--;
     		seconds = 60;
     	}
-    	if (minutes <=0) {
+    	
+    	if ( (minutes <= 0) && (hours > 0) ){
     		hours--;
     		minutes = 60;
     	}
@@ -60,20 +72,28 @@ public class ChessTimer2 {
         String tString = "" + timeFormat.format(hours)
                 + ":" + timeFormat.format(minutes)
                 + ":" + timeFormat.format(seconds)
-                + ":" + timeFormat.format(hundredths);
+                + ":" + hundredths_fmt.format(hundredths).substring(1,3);
         timeString = tString;
     }
+    
+    // 
+    private class CountDownTask extends TimerTask {
+    	public void run() {
+    		if ( (hours > 0) || (minutes > 0) || (seconds > 0) || (hundredths > 0) ) {
+    			countDown();
+    		} 
+    		else 
+    		{
+    			cancel();
+    			System.out.println("Timer Ended");
+    		}
+    	}
+    }
 	
-
 	public static void main(String[] args) {
-		ChessTimer2 clock = new ChessTimer2(1, 59, 33, 87);
-		int i = 0;
-		while ( i >= 0) {
-			i++;
-			if (i % 60 == 0) {
-				clock.countDown();
-			}
-		}
+		ChessTimer2 cTimer = new ChessTimer2(1, 0, 0, 0);
+		Timer timer = new Timer("Chess Timer", false);
+		timer.scheduleAtFixedRate(cTimer.new CountDownTask(), 0, updateFreq);
 	}
 
 }
