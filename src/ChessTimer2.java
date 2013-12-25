@@ -4,14 +4,21 @@ import java.util.TimerTask;
 
 public class ChessTimer2 {
 	
+	//Constants
+	private static int HH_FACTOR = 60 * 60 * 1000;
+	private static int MM_FACTOR = 60 * 1000;
+	private static int SS_FACTOR = 1000;
+	private static int HS_FACTOR = 10;
+	
 	// Time Vars
-	private static Integer hundredths;
-    private static int seconds;
-    private static int minutes;
-    private static int hours;
+	private static long hundredths;
+    private static long seconds;
+    private static long minutes;
+    private static long hours;
+    private static long total_ms;
     
 	// Timer vars
-    private static final long updateFreq = 10;
+    private static final long UPDATE_FREQ = 1;
     
     // Time string formatting vars
     private String timeString = "";
@@ -20,12 +27,20 @@ public class ChessTimer2 {
     
     public ChessTimer2(int hh, int mm, int ss, int hs) {
     	//TODO: once validation added, use the setters in the constructor. 
-    	hours = hh;
+    	/*
+    	hours = hh; 
     	minutes = mm;
     	seconds = ss;
     	hundredths = hs;
+    	*/
+    	total_ms = 
+    			hs * HS_FACTOR
+    			+ ss * SS_FACTOR
+    			+ mm * MM_FACTOR
+    			+ hh * HH_FACTOR;
+    	calcTimes();
     }
-    
+
     //TODO: Add int validation to setters. 
     public void setHours(int hh) {
     	hours = hh;
@@ -39,32 +54,24 @@ public class ChessTimer2 {
     	seconds = ss;
     }
     
+    private void calcTimes() {
+    	long temp_ms = total_ms;
+    	hours =  temp_ms / HH_FACTOR;
+    	temp_ms = total_ms % HH_FACTOR;
+    	minutes = temp_ms / MM_FACTOR;
+    	temp_ms = total_ms % MM_FACTOR;
+    	seconds = temp_ms / SS_FACTOR;
+    	temp_ms = total_ms % SS_FACTOR;
+    	hundredths = temp_ms / HS_FACTOR;
+    }
+    
     private void countDown() {
-    	//TODO: This entire logic tree is broken. Fix it. 
-    	//TODO: Change this to use a single long value that represents milliseconds? 
-    	if (hundredths > 0) {
-    		hundredths--;
+    	if (total_ms > 0) {
+    		total_ms--;
     	}
-    	
-    	if ( (hundredths <= 0) && (seconds > 0) ) {
-    		seconds--;
-    		hundredths = 100;
-    	}
-    	
-    	if ( (seconds <= 0 ) && (minutes > 0) ){
-    		minutes--;
-    		seconds = 60;
-    	}
-    	
-    	if ( (minutes <= 0) && (hours > 0) ){
-    		hours--;
-    		minutes = 60;
-    	}
-    	if (hours <= 0) {
-    		hours = 0;
-    	}
-    	       
-        updateTimeString();
+        calcTimes();
+    	updateTimeString();
+        System.out.println(total_ms);
         System.out.println(timeString);
     }
     
@@ -75,11 +82,10 @@ public class ChessTimer2 {
                 + ":" + hundredths_fmt.format(hundredths).substring(1,3);
         timeString = tString;
     }
-    
-    // 
+     
     private class CountDownTask extends TimerTask {
     	public void run() {
-    		if ( (hours > 0) || (minutes > 0) || (seconds > 0) || (hundredths > 0) ) {
+    		if (total_ms > 0) {
     			countDown();
     		} 
     		else 
@@ -91,9 +97,9 @@ public class ChessTimer2 {
     }
 	
 	public static void main(String[] args) {
-		ChessTimer2 cTimer = new ChessTimer2(1, 0, 0, 0);
+		ChessTimer2 cTimer = new ChessTimer2(1, 1, 1, 1);
 		Timer timer = new Timer("Chess Timer", false);
-		timer.scheduleAtFixedRate(cTimer.new CountDownTask(), 0, updateFreq);
+		timer.scheduleAtFixedRate(cTimer.new CountDownTask(), 0, UPDATE_FREQ);
 	}
 
 }
