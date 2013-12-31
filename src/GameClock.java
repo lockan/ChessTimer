@@ -2,7 +2,7 @@ import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ChessTimer2 {
+public class GameClock {
 	
 	//Constants
 	private static int HH_FACTOR = 60 * 60 * 1000;
@@ -16,6 +16,7 @@ public class ChessTimer2 {
     private static long minutes;
     private static long hours;
     private static long total_ms;
+    private static long elapsed_ms = 0;
     
 	// Timer vars
     private static final long UPDATE_FREQ = 1;
@@ -25,7 +26,7 @@ public class ChessTimer2 {
     private DecimalFormat timeFormat = new DecimalFormat("00");
     private DecimalFormat hundredths_fmt = new DecimalFormat("000");
     
-    public ChessTimer2(int hh, int mm, int ss, int hs) {
+    public GameClock(int hh, int mm, int ss, int hs) {
     	//TODO: once validation added, use the setters in the constructor. 
     	/*
     	hours = hh; 
@@ -54,6 +55,9 @@ public class ChessTimer2 {
     	seconds = ss;
     }
     
+    //TODO: Revise this to generalize it. should take a long param (ms).
+    // Goal is to make it flexible. Want to use for both countdown and elapsed times. 
+    // Return a formatted string for the time based on the input number of ms. 
     private void calcTimes() {
     	long temp_ms = total_ms;
     	hours =  temp_ms / HH_FACTOR;
@@ -68,13 +72,16 @@ public class ChessTimer2 {
     private void countDown() {
     	if (total_ms > 0) {
     		total_ms--;
+    		elapsed_ms++;
     	}
         calcTimes();
     	updateTimeString();
         System.out.println(total_ms);
+        System.out.println(elapsed_ms);
         System.out.println(timeString);
     }
     
+    //TODO: Revise this when you revise calcTimes. May become redundant. 
     private void updateTimeString() {
         String tString = "" + timeFormat.format(hours)
                 + ":" + timeFormat.format(minutes)
@@ -97,8 +104,8 @@ public class ChessTimer2 {
     }
 	
 	public static void main(String[] args) {
-		ChessTimer2 cTimer = new ChessTimer2(1, 1, 1, 1);
-		Timer timer = new Timer("Chess Timer", false);
+		GameClock cTimer = new GameClock(0, 0, 30, 0);
+		Timer timer = new Timer("ClockMachine", false);
 		timer.scheduleAtFixedRate(cTimer.new CountDownTask(), 0, UPDATE_FREQ);
 	}
 
