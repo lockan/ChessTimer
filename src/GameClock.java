@@ -11,10 +11,6 @@ public class GameClock {
 	private static int HS_FACTOR = 10;
 	
 	// Time Vars
-	private static long hundredths;
-    private static long seconds;
-    private static long minutes;
-    private static long hours;
     private static long total_ms;
     private static long elapsed_ms = 0;
     
@@ -22,51 +18,34 @@ public class GameClock {
     private static final long UPDATE_FREQ = 1;
     
     // Time string formatting vars
-    private String timeString = "";
     private DecimalFormat timeFormat = new DecimalFormat("00");
     private DecimalFormat hundredths_fmt = new DecimalFormat("000");
     
     public GameClock(int hh, int mm, int ss, int hs) {
-    	//TODO: once validation added, use the setters in the constructor. 
-    	/*
-    	hours = hh; 
-    	minutes = mm;
-    	seconds = ss;
-    	hundredths = hs;
-    	*/
+    	//TODO: Add validation to the constructor. values must be legal positive ints. 
     	total_ms = 
     			hs * HS_FACTOR
     			+ ss * SS_FACTOR
     			+ mm * MM_FACTOR
     			+ hh * HH_FACTOR;
-    	calcTimes();
-    }
-
-    //TODO: Add int validation to setters. 
-    public void setHours(int hh) {
-    	hours = hh;
+    	getFormattedTimeString(total_ms);
     }
     
-    public void setMinutes(int mm) {
-    	minutes = mm;
-    }
-    
-    public void setSeconds(int ss) {
-    	seconds = ss;
-    }
-    
-    //TODO: Revise this to generalize it. should take a long param (ms).
-    // Goal is to make it flexible. Want to use for both countdown and elapsed times. 
-    // Return a formatted string for the time based on the input number of ms. 
-    private void calcTimes() {
-    	long temp_ms = total_ms;
-    	hours =  temp_ms / HH_FACTOR;
-    	temp_ms = total_ms % HH_FACTOR;
-    	minutes = temp_ms / MM_FACTOR;
-    	temp_ms = total_ms % MM_FACTOR;
-    	seconds = temp_ms / SS_FACTOR;
-    	temp_ms = total_ms % SS_FACTOR;
-    	hundredths = temp_ms / HS_FACTOR;
+    private String getFormattedTimeString(long in_ms) {
+    	long temp_ms = in_ms;
+    	long temp_hours =  temp_ms / HH_FACTOR;
+    	temp_ms = in_ms % HH_FACTOR;
+    	long temp_minutes = temp_ms / MM_FACTOR;
+    	temp_ms = in_ms % MM_FACTOR;
+    	long temp_seconds = temp_ms / SS_FACTOR;
+    	temp_ms = in_ms % SS_FACTOR;
+    	long temp_hundredths = temp_ms / HS_FACTOR;
+    	
+    	String tString = "" + timeFormat.format(temp_hours)
+                + ":" + timeFormat.format(temp_minutes)
+                + ":" + timeFormat.format(temp_seconds)
+                + ":" + hundredths_fmt.format(temp_hundredths).substring(1,3);
+    	return tString;
     }
     
     private void countDown() {
@@ -74,20 +53,10 @@ public class GameClock {
     		total_ms--;
     		elapsed_ms++;
     	}
-        calcTimes();
-    	updateTimeString();
         System.out.println(total_ms);
         System.out.println(elapsed_ms);
-        System.out.println(timeString);
-    }
-    
-    //TODO: Revise this when you revise calcTimes. May become redundant. 
-    private void updateTimeString() {
-        String tString = "" + timeFormat.format(hours)
-                + ":" + timeFormat.format(minutes)
-                + ":" + timeFormat.format(seconds)
-                + ":" + hundredths_fmt.format(hundredths).substring(1,3);
-        timeString = tString;
+        System.out.println("T: " + getFormattedTimeString(total_ms));
+        System.out.println("E: " + getFormattedTimeString(elapsed_ms));
     }
      
     private class CountDownTask extends TimerTask {
